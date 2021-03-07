@@ -2,6 +2,7 @@
 # 目前版本无法测前导0
 # 目前有两个mode，高概率0模式与无0模式
 # cjy记得删sys.path.append和改.jar路径！！
+# 下一版本加log
 ###########
 
 import sys
@@ -12,7 +13,9 @@ import exrex
 import subprocess
 from sympy import *
 
+global AK
 AK = 1
+
 x = Symbol("x")
 # lot of 0
 termLotOfZero = r'([+-])?((([+-])?(0|([1-9][0-9]{0,})))|(x(\*{2}([+-])?(0|([1-9][0-9]{0,})))?))(\*((([+-])?(0|([1-9][0-9]{0,})))|(x(\*{2}([+-])?(0|([1-9][0-9]{0,})))?))){0,}'
@@ -22,7 +25,7 @@ termNoZero = r'([+-])?((([+-])?(([1-9][0-9]{0,})))|(x(\*{2}([+-])?(([1-9][0-9]{0
 # take care here:
 BasicOrder = 'java -jar '
 fileName1 = 'home1_1.jar'
-fileName2 = 'cjy2.jar'
+fileName2 = 'lhy2.jar'
 PATH = BasicOrder + fileName1
 PATH1 = BasicOrder + fileName1
 PATH2 = BasicOrder + fileName2
@@ -72,6 +75,7 @@ def FileReadLine(point):
 
 
 def AutoDataTest(expression, Range, checkDetail):
+    global AK
     for turn in range(Range):
         # create test input line: stdinLine
         stdinLine = AutoExpression(expression)
@@ -124,6 +128,7 @@ def AutoDataTest(expression, Range, checkDetail):
 
 
 def AutoData():
+    global AK
     # set standard form:
     # with front 0
     # term0 = r'(([+-])?((([+-])?[0-9]{1,})|(x(\*{2}([+-])?[0-9]{1,})?))(\*((([+-])?[0-9]{1,})|(x(\*{2}([+-])?[0-9]{1,})?))){0,})'
@@ -155,6 +160,7 @@ def AutoData():
 
 
 def HandData():
+    global AK
     print(">>>if you need details, input '1'")
     checkDetail = sys.stdin.readline()
 
@@ -208,12 +214,13 @@ def HandData():
             print("HIM answer:")
             print(answer)
             print("STD answer:")
-            print(snswer)
-            #           AK = 0
+            print(stdAnswer)
+            AK = 0
             break
 
 
 def CompareCheck():
+    global AK
     # compare hand data output:
     print(">>>if you need details, input '1'")
     checkDetail = sys.stdin.readline()
