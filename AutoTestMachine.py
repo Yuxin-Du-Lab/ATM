@@ -144,6 +144,11 @@ def HandData():
         stdAnsLine = HandDataAns.readline().split("\n", 1)[0]
 
         # get standard answer
+        print("STD answer:")
+        print(stdAnsLine)
+        print("HIM answer:")
+        print(answer)
+
         stdAnswer = eval(stdAnsLine)
         if answer == "":
             print("point" + str(turn) + "-----NO output")
@@ -179,6 +184,8 @@ def HandData():
             print(stdAnswer)
 #           AK = 0
             break
+
+
 
 print("IF you want auto data, input '1'")
 mode = sys.stdin.readline()
