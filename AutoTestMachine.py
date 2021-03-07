@@ -1,28 +1,51 @@
 ################
 # 目前版本无法测前导0
 # 目前有两个mode，高概率0模式与无0模式
+# cjy记得删sys.path.append和改.jar路径！！
 ###########
 
 import sys
-
 sys.path.append('/home/yuxin/.local/lib/python2.7/site-packages')
+
 import os
 import exrex
 import subprocess
 from sympy import *
 
-PATH = 'java -jar cjy2.jar'
 AK = 1
 x = Symbol("x")
+# lot of 0
+termLotOfZero = r'([+-])?((([+-])?(0|([1-9][0-9]{0,})))|(x(\*{2}([+-])?(0|([1-9][0-9]{0,})))?))(\*((([+-])?(0|([1-9][0-9]{0,})))|(x(\*{2}([+-])?(0|([1-9][0-9]{0,})))?))){0,}'
+# no 0
+termNoZero = r'([+-])?((([+-])?(([1-9][0-9]{0,})))|(x(\*{2}([+-])?(([1-9][0-9]{0,})))?))(\*((([+-])?(([1-9][0-9]{0,})))|(x(\*{2}([+-])?(([1-9][0-9]{0,})))?))){0,}'
+
+# take care here:
+BasicOrder = 'java -jar '
+fileName1 = 'home1_1.jar'
+fileName2 = 'cjy2.jar'
+PATH = BasicOrder + fileName1
+PATH1 = BasicOrder + fileName1
+PATH2 = BasicOrder + fileName2
 
 
-# print(term)
-# print(expression)
+def BuildExpression(term):
+    return r'([+-])?' + term + r'(([+-])' + term + r'){0,}'
 
-def Communicate(stdinLine):
+
+def Communicate(stdinLine, path):
     # communicate to .jar file
+    p = subprocess.run(
+        path,
+        input=stdinLine,
+        stdout=subprocess.PIPE,
+        text=True,
+        shell=True
+    )
+    buffer = p.stdout
+    answer = buffer.split("\n", 1)[0]
+    '''
     p = subprocess.Popen(
-        PATH,
+        path,
         shell=True,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE
@@ -34,26 +57,35 @@ def Communicate(stdinLine):
 
     # his real answer:
     answer = buffer.split('\n', 1)[0]  # str
+    '''
 
     return answer
+
+
+def AutoExpression(expression):
+    stdinLine = exrex.getone(expression)  # str
+    return stdinLine
+
+
+def FileReadLine(point):
+    return point.readline().split("\n", 1)[0]  # str
 
 
 def AutoDataTest(expression, Range, checkDetail):
     for turn in range(Range):
         # create test input line: stdinLine
-        # stdinLine = exrex.getone(term)
-        stdinLine = exrex.getone(expression)
-        # print(stdinLine)
+        stdinLine = AutoExpression(expression)
 
         # print input:
         if checkDetail == 1:
             print('stdin:\n' + stdinLine)
 
         # communicate to .jar file
-        answer = Communicate(stdinLine)
+        answer = Communicate(stdinLine, PATH)
 
         # get standard answer
-        stdAnswer = diff(eval(stdinLine), x)  # mul
+        stdAnswer = diff(eval(stdinLine), x)  # ADD
+
         if checkDetail == 1:
             print("stdAnswer:\n" + str(stdAnswer))
 
@@ -82,7 +114,7 @@ def AutoDataTest(expression, Range, checkDetail):
             print("HIM answer:")
             print(answer)
             print("STD answer:")
-            print(stdAnswer)
+            print(sdAnswer)
             AK = 0
             break
 
@@ -95,11 +127,6 @@ def AutoData():
     # set standard form:
     # with front 0
     # term0 = r'(([+-])?((([+-])?[0-9]{1,})|(x(\*{2}([+-])?[0-9]{1,})?))(\*((([+-])?[0-9]{1,})|(x(\*{2}([+-])?[0-9]{1,})?))){0,})'
-
-    # lot of 0
-    termLotOfZero = r'([+-])?((([+-])?(0|([1-9][0-9]{0,})))|(x(\*{2}([+-])?(0|([1-9][0-9]{0,})))?))(\*((([+-])?(0|([1-9][0-9]{0,})))|(x(\*{2}([+-])?(0|([1-9][0-9]{0,})))?))){0,}'
-    # no 0
-    termNoZero = r'([+-])?((([+-])?(([1-9][0-9]{0,})))|(x(\*{2}([+-])?(([1-9][0-9]{0,})))?))(\*((([+-])?(([1-9][0-9]{0,})))|(x(\*{2}([+-])?(([1-9][0-9]{0,})))?))){0,}'
 
     ########################
     print(">>>INPUT int to set the test point number")
@@ -116,8 +143,7 @@ def AutoData():
     else:
         print(">>>Thanks for choose None Zero mode")
         term = termNoZero
-    # expression0 = r'([+-])?' + term0 + r'(([+-])' + term0 + r'){0,}'
-    expression = r'([+-])?' + term + r'(([+-])' + term + r'){0,}'
+    expression = BuildExpression(term)
 
     ########################
     print(">>>if YOU want to check details, please input '1', else input '0'")
@@ -127,27 +153,27 @@ def AutoData():
 
     AutoDataTest(expression, int(Range), int(checkDetail))
 
-    if AK == 1:
-        print(">>>POINTS are ALL KILLED!!!!!")
-
 
 def HandData():
+    print(">>>if you need details, input '1'")
+    checkDetail = sys.stdin.readline()
+
     HandDataIn = open("HandDataIn.txt", "r")
     HandDataAns = open("HandDataAns.txt", "r")
     turn = 0
     while True:
         turn += 1
-        stdinLine = HandDataIn.readline().split("\n", 1)[0]
+        stdinLine = FileReadLine(HandDataIn)
         if stdinLine == '':
-            break;
-        answer = Communicate(stdinLine)
-        stdAnsLine = HandDataAns.readline().split("\n", 1)[0]
+            break
+        answer = Communicate(stdinLine, PATH)
+        stdAnsLine = FileReadLine(HandDataAns)
 
-        # get standard answer
-        print("STD answer:")
-        print(stdAnsLine)
-        print("HIM answer:")
-        print(answer)
+        if int(checkDetail) == 1:
+            print("STD answer:")
+            print(stdAnsLine)
+            print("HIM answer:")
+            print(answer)
 
         stdAnswer = eval(stdAnsLine)
         if answer == "":
@@ -158,7 +184,7 @@ def HandData():
             print(answer)
             print("STD answer:")
             print(stdAnswer)
-#           AK = 0
+            AK = 0
             break
 
         if stdAnsLine == '':
@@ -169,6 +195,7 @@ def HandData():
             print(answer)
             print("STD answer:")
             print(stdAnswer)
+            AK = 0
             break
 
         answer = eval(answer)
@@ -181,16 +208,65 @@ def HandData():
             print("HIM answer:")
             print(answer)
             print("STD answer:")
-            print(stdAnswer)
-#           AK = 0
+            print(snswer)
+            #           AK = 0
             break
 
 
+def CompareCheck():
+    # compare hand data output:
+    print(">>>if you need details, input '1'")
+    checkDetail = sys.stdin.readline()
 
-print("IF you want auto data, input '1'")
+    print(">>>Now Check Hand data")
+    HandDataIn = open("HandDataIn.txt", "r")
+    turn = 0
+    while True:
+        turn += 1
+        stdinLine = FileReadLine(HandDataIn)
+        if stdinLine == '':
+            break;
+        answer1 = Communicate(stdinLine, PATH1)
+        answer2 = Communicate(stdinLine, PATH2)
+
+        if int(checkDetail) == 1:
+            print("HIM1 answer:")
+            print(answer1)
+            print("HIM2 answer:")
+            print(answer2)
+
+        answer1 = eval(answer1)
+        answer2 = eval(answer2)
+        if simplify(answer1 - answer2) == 0:
+            print("point" + str(turn) + "-----ALL SAME")
+        else:
+            print("point" + str(turn) + "-----DIFFERENT OUTPUT")
+            print("stdin:")
+            print(stdinLine)
+            print("HIM1 answer:")
+            print(answer1)
+            print("HIM2 answer:")
+            print(answer2)
+            print("STD answer:")
+            print(snswer)
+            AK = 0
+            break
+
+
+################
+
+print(">>>INPUT '1', turn to Auto Data")
+print(">>>INPUT '2', turn to Hand Data")
+print(">>>INPUT '3', turn to Compare Run")
 mode = sys.stdin.readline()
 if int(mode) == 1:
     AutoData()
-else:
+elif int(mode) == 2:
     HandData()
-    print("not finished built")
+elif int(mode) == 3:
+    CompareCheck()
+else:
+    print("What's the f**k mode!")
+
+if AK == 1:
+    print(">>>All points are Killed!")
