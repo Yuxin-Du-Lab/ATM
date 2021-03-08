@@ -22,13 +22,21 @@ termLotOfZero = r'([+-])?((([+-])?(0|([1-9][0-9]{0,})))|(x(\*{2}([+-])?(0|([1-9]
 # no 0
 termNoZero = r'([+-])?((([+-])?(([1-9][0-9]{0,})))|(x(\*{2}([+-])?(([1-9][0-9]{0,})))?))(\*((([+-])?(([1-9][0-9]{0,})))|(x(\*{2}([+-])?(([1-9][0-9]{0,})))?))){0,}'
 
-# take care here:
+# SET PATH here:
 BasicOrder = 'java -jar '
-fileName1 = 'home1_1.jar'
-fileName2 = 'lhy2.jar'
-PATH = BasicOrder + fileName1
-PATH1 = BasicOrder + fileName1
-PATH2 = BasicOrder + fileName2
+fileName1 = 'Saber.jar'
+fileName2 = 'Lancer.jar'
+fileName3 = 'Archer.jar'
+fileName4 = 'Caster.jar'
+fileName5 = 'Assassin.jar'
+fileName6 = 'Berserker.jar'
+fileName7 = 'Alterego.jar'
+fileName8 = 'home1_1.jar'
+fileName9 = 'cjy2.jar'
+
+PATH = BasicOrder + fileName8
+PATH1 = BasicOrder + fileName2
+PATH2 = BasicOrder + fileName8
 
 
 def BuildExpression(term):
@@ -226,11 +234,11 @@ def CompareCheck():
     checkDetail = sys.stdin.readline()
 
     print(">>>Now Check Hand data")
-    HandDataIn = open("HandDataIn.txt", "r")
+    CompareData = open("CompareData.txt", "r")
     turn = 0
     while True:
         turn += 1
-        stdinLine = FileReadLine(HandDataIn)
+        stdinLine = FileReadLine(CompareData)
         if stdinLine == '':
             break;
         answer1 = Communicate(stdinLine, PATH1)
