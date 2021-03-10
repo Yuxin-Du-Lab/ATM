@@ -2,8 +2,7 @@
 # 目前版本无法测前导0
 # 目前有两个mode，高概率0模式与无0模式
 # cjy记得删sys.path.append和改.jar路径！！
-# 下一版本加log
-###########
+# ###########
 
 import sys
 sys.path.append('/home/yuxin/.local/lib/python2.7/site-packages')
@@ -32,12 +31,69 @@ fileName5 = 'Assassin.jar'
 fileName6 = 'Berserker.jar'
 fileName7 = 'Alterego.jar'
 fileName8 = 'home1_1.jar'
-fileName9 = 'cjy2.jar'
+fileName9 = 'cjy.jar'
+logName = "output.log"
 
-PATH = BasicOrder + fileName8
+PATH = BasicOrder + fileName9
 PATH1 = BasicOrder + fileName2
-PATH2 = BasicOrder + fileName8
+PATH2 = BasicOrder + fileName9
 
+# FILE I/O
+FILE = open(logName, 'w')
+
+# Different
+
+def PrintDifferent(turn, stdinLine, answer1, answer2):
+    print("point" + str(turn) + "-----DIFFERENT OUTPUT")
+    print("stdin:")
+    print(stdinLine)
+    print("HIM1 answer:")
+    print(answer1)
+    print("HIM2 answer:")
+    print(answer2)
+
+# All Same
+def PrintAllSame(turn):
+    PrintString("point" + str(turn) + "-----ALL SAME")
+
+# No Answer
+def PrintNoAnswer(stdinLine, answer, stdAnswer):
+    PrintString("Where is my answer?")
+    PrintString("stdin:")
+    PrintString(stdinLine)
+    PrintString("HIM answer:")
+    PrintString(answer)
+    PrintString("STD answer:")
+    PrintString(stdAnswer)
+
+# Wrong Answer
+def PrintWrongAnswer(turn, stdinLine, answer, stdAnswer):
+    PrintString("point" + str(turn) + "-----WA")
+    PrintString("stdin:")
+    PrintString(str(stdinLine))
+    PrintString("HIM answer:")
+    PrintString(str(answer))
+    PrintString("STD answer:")
+    PrintString(str(stdAnswer))
+
+# Accept
+def PrintAccept(turn):
+    PrintString("point" + str(turn) + "-----AC")
+
+# No Output
+def PrintNoOutput(turn, stdinLine, answer, stdAnswer):
+    PrintString("point" + str(turn) + "-----NO output")
+    PrintString("stdin:")
+    PrintString(str(stdinLine))
+    PrintString("HIM answer:")
+    PrintString(str(answer))
+    PrintString("STD answer:")
+    PrintString(str(stdAnswer))
+
+# PrintStr to both console and log
+def PrintString(str):
+    print(str)
+    FILE.write(str + '\n')
 
 def BuildExpression(term):
     return r'([+-])?' + term + r'(([+-])' + term + r'){0,}'
@@ -85,12 +141,11 @@ def FileReadLine(point):
 def AutoDataTest(expression, Range, checkDetail):
     global AK
     for turn in range(Range):
+        # print \n
+        PrintString('\n')
+
         # create test input line: stdinLine
         stdinLine = AutoExpression(expression)
-
-        # print input:
-        if checkDetail == 1:
-            print('stdin:\n' + stdinLine)
 
         # communicate to .jar file
         answer = Communicate(stdinLine, PATH)
@@ -98,35 +153,25 @@ def AutoDataTest(expression, Range, checkDetail):
         # get standard answer
         stdAnswer = diff(eval(stdinLine), x)  # ADD
 
+        # print input & answer
         if checkDetail == 1:
-            print("stdAnswer:\n" + str(stdAnswer))
+            PrintString('stdin:\n' + stdinLine)
+            PrintString("stdAnswer:\n" + str(stdAnswer))
 
         if answer == "":
-            print("point" + str(turn) + "-----NO output")
-            print("stdin:")
-            print(stdinLine)
-            print("HIM answer:")
-            print(answer)
-            print("STD answer:")
-            print(stdAnswer)
+            PrintNoOutput(turn, stdinLine, answer, stdAnswer)
             AK = 0
             break
 
         answer = eval(answer)
         if checkDetail == 1:
-            print("answer:\n" + str(answer))
+            PrintString("answer:\n" + str(answer))
 
         # check ifEqual
         if simplify(stdAnswer - answer) == 0:
-            print("point" + str(turn) + "-----AC")
+            PrintAccept(turn)
         else:
-            print("point" + str(turn) + "-----WA")
-            print("stdin:")
-            print(stdinLine)
-            print("HIM answer:")
-            print(answer)
-            print("STD answer:")
-            print(sdAnswer)
+            PrintWrongAnswer(turn, stdinLine, answer, stdAnswer)
             AK = 0
             break
 
@@ -144,17 +189,17 @@ def AutoData():
     ########################
     print(">>>INPUT int to set the test point number")
     Range = sys.stdin.readline()
-    print(">>>Range is set as:" + str(Range))
+    PrintString(">>>Range is set as:" + str(Range))
 
     ########################
     print(">>>INPUT '1', turn to Lots of Zero mode")
     print(">>>INPUT '2', turn to None Zero mode")
     mode = sys.stdin.readline()
     if int(mode) == 1:
-        print(">>>Thanks for choose Lots of Zero mode")
+        PrintString(">>>Thanks for choose Lots of Zero mode")
         term = termLotOfZero
     else:
-        print(">>>Thanks for choose None Zero mode")
+        PrintString(">>>Thanks for choose None Zero mode")
         term = termNoZero
     expression = BuildExpression(term)
 
@@ -162,20 +207,24 @@ def AutoData():
     print(">>>if YOU want to check details, please input '1', else input '0'")
     checkDetail = sys.stdin.readline()
     if int(checkDetail) == 1:
-        print(">>>you choose checking details")
+        PrintString(">>>you choose checking details")
 
     AutoDataTest(expression, int(Range), int(checkDetail))
 
 
 def HandData():
     global AK
+    PrintString(">>>Now Check Hand data")
+
     print(">>>if you need details, input '1'")
-    checkDetail = sys.stdin.readline()
+    checkDetail = eval(sys.stdin.readline())
 
     HandDataIn = open("HandDataIn.txt", "r")
     HandDataAns = open("HandDataAns.txt", "r")
     turn = 0
     while True:
+        PrintString('\n')
+
         turn += 1
         stdinLine = FileReadLine(HandDataIn)
         if stdinLine == '':
@@ -183,46 +232,34 @@ def HandData():
         answer = Communicate(stdinLine, PATH)
         stdAnsLine = FileReadLine(HandDataAns)
 
+        # print input & answer
+        if checkDetail == 1:
+            PrintString('stdin:\n' + stdinLine)
+            PrintString("stdAnswer:\n" + str(stdAnsLine))
+        '''
         if int(checkDetail) == 1:
             print("STD answer:")
             print(stdAnsLine)
             print("HIM answer:")
             print(answer)
+        '''
 
         stdAnswer = eval(stdAnsLine)
         if answer == "":
-            print("point" + str(turn) + "-----NO output")
-            print("stdin:")
-            print(stdinLine)
-            print("HIM answer:")
-            print(answer)
-            print("STD answer:")
-            print(stdAnswer)
+            PrintNoOutput(turn, stdinLine, answer, stdAnswer)
             AK = 0
             break
 
         if stdAnsLine == '':
-            print("Where is my f**k answer?")
-            print("stdin:")
-            print(stdinLine)
-            print("HIM answer:")
-            print(answer)
-            print("STD answer:")
-            print(stdAnswer)
+            PrintNoAnswer(stdinLine, answer, stdAnswer)
             AK = 0
             break
 
         answer = eval(answer)
         if simplify(stdAnswer - answer) == 0:
-            print("point" + str(turn) + "-----AC")
+            PrintAccept(turn)
         else:
-            print("point" + str(turn) + "-----WA")
-            print("stdin:")
-            print(stdinLine)
-            print("HIM answer:")
-            print(answer)
-            print("STD answer:")
-            print(stdAnswer)
+            PrintWrongAnswer(turn, stdinLine, answer, stdAnswer)
             AK = 0
             break
 
@@ -233,42 +270,34 @@ def CompareCheck():
     print(">>>if you need details, input '1'")
     checkDetail = sys.stdin.readline()
 
-    print(">>>Now Check Hand data")
+    PrintString(">>>Now Check Hand data")
     CompareData = open("CompareData.txt", "r")
     turn = 0
     while True:
+        PrintString('\n')
         turn += 1
         stdinLine = FileReadLine(CompareData)
         if stdinLine == '':
-            break;
+            break
         answer1 = Communicate(stdinLine, PATH1)
         answer2 = Communicate(stdinLine, PATH2)
 
         if int(checkDetail) == 1:
-            print("HIM1 answer:")
-            print(answer1)
-            print("HIM2 answer:")
-            print(answer2)
+            PrintString("HIM1 answer:")
+            PrintString(answer1)
+            PrintString("HIM2 answer:")
+            PrintString(answer2)
 
         answer1 = eval(answer1)
         answer2 = eval(answer2)
         if simplify(answer1 - answer2) == 0:
-            print("point" + str(turn) + "-----ALL SAME")
+            PrintAllSame(turn)
         else:
-            print("point" + str(turn) + "-----DIFFERENT OUTPUT")
-            print("stdin:")
-            print(stdinLine)
-            print("HIM1 answer:")
-            print(answer1)
-            print("HIM2 answer:")
-            print(answer2)
-            print("STD answer:")
-            print(snswer)
+            PrintDifferent(turn, stdinLine, answer1, answer2)
             AK = 0
             break
 
-
-################
+# ---------------main---------------
 
 print(">>>INPUT '1', turn to Auto Data")
 print(">>>INPUT '2', turn to Hand Data")
@@ -281,7 +310,10 @@ elif int(mode) == 2:
 elif int(mode) == 3:
     CompareCheck()
 else:
-    print("What's the f**k mode!")
+    PrintString("What's the mode!")
 
 if AK == 1:
-    print(">>>All points are Killed!")
+    PrintString(">>>All points are Killed!")
+
+# close FILE
+FILE.close()
