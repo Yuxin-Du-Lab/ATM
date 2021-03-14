@@ -12,6 +12,10 @@ import exrex
 import subprocess
 from sympy import *
 
+import Head
+
+# print(Head.Term)
+
 global AK
 AK = 1
 
@@ -30,12 +34,12 @@ fileName4 = 'Caster.jar'
 fileName5 = 'Assassin.jar'
 fileName6 = 'Berserker.jar'
 fileName7 = 'Alterego.jar'
-fileName8 = 'home1_1.jar'
+fileName8 = 'OOhomework1.2.jar'
 fileName9 = 'cjy.jar'
 logName = "output.log"
 
-PATH = BasicOrder + fileName9
-PATH1 = BasicOrder + fileName2
+PATH = BasicOrder + fileName8
+PATH1 = BasicOrder + fileName8
 PATH2 = BasicOrder + fileName9
 
 # FILE I/O
@@ -95,9 +99,11 @@ def PrintString(str):
     print(str)
     FILE.write(str + '\n')
 
-def BuildExpression(term):
-    return r'([+-])?' + term + r'(([+-])' + term + r'){0,}'
-
+def BuildExpression(term, mode):
+    if mode!=3:
+        return r'([+-])?' + term + r'(([+-])' + term + r'){0,}'
+    else:
+        return Head.EXPRESSION1
 
 def Communicate(stdinLine, path):
     # communicate to .jar file
@@ -131,6 +137,7 @@ def Communicate(stdinLine, path):
 
 def AutoExpression(expression):
     stdinLine = exrex.getone(expression)  # str
+    print(stdinLine)
     return stdinLine
 
 
@@ -194,14 +201,18 @@ def AutoData():
     ########################
     print(">>>INPUT '1', turn to Lots of Zero mode")
     print(">>>INPUT '2', turn to None Zero mode")
+    print(">>>INPUT '3', turn to homework2")
     mode = sys.stdin.readline()
     if int(mode) == 1:
         PrintString(">>>Thanks for choose Lots of Zero mode")
         term = termLotOfZero
-    else:
+    elif int(mode) == 2:
         PrintString(">>>Thanks for choose None Zero mode")
         term = termNoZero
-    expression = BuildExpression(term)
+    else:
+        PrintString(">>>Thanks for choose homework2")
+        term = Head.TERM
+    expression = BuildExpression(term, int(mode))
 
     ########################
     print(">>>if YOU want to check details, please input '1', else input '0'")
