@@ -34,13 +34,14 @@ fileName4 = 'Caster.jar'
 fileName5 = 'Assassin.jar'
 fileName6 = 'Berserker.jar'
 fileName7 = 'Alterego.jar'
-fileName8 = 'OOhomework1.2.jar'
-fileName9 = 'cjy.jar'
+fileName8 = 'OOhomework1.3.jar'
+fileName9 = 'Rider.jar'
+fileName10 = 'cjy.jar'
 logName = "output.log"
 
 PATH = BasicOrder + fileName8
-PATH1 = BasicOrder + fileName8
-PATH2 = BasicOrder + fileName9
+PATH1 = BasicOrder + fileName3
+PATH2 = BasicOrder + fileName3
 
 # FILE I/O
 FILE = open(logName, 'w')
@@ -100,10 +101,12 @@ def PrintString(str):
     FILE.write(str + '\n')
 
 def BuildExpression(term, mode):
-    if mode!=3:
+    if mode==1 | mode==2:
         return r'([+-])?' + term + r'(([+-])' + term + r'){0,}'
-    else:
+    elif mode==3:
         return Head.EXPRESSION1
+    elif mode==4:
+        return Head.EXPRESSION2
 
 def Communicate(stdinLine, path):
     # communicate to .jar file
@@ -202,6 +205,7 @@ def AutoData():
     print(">>>INPUT '1', turn to Lots of Zero mode")
     print(">>>INPUT '2', turn to None Zero mode")
     print(">>>INPUT '3', turn to homework2")
+    print(">>>INPUT '4', turn to homework3")
     mode = sys.stdin.readline()
     if int(mode) == 1:
         PrintString(">>>Thanks for choose Lots of Zero mode")
@@ -209,8 +213,11 @@ def AutoData():
     elif int(mode) == 2:
         PrintString(">>>Thanks for choose None Zero mode")
         term = termNoZero
-    else:
+    elif int(mode) == 3:
         PrintString(">>>Thanks for choose homework2")
+        term = Head.TERM
+    elif int(mode) == 4:
+        PrintString(">>>Thanks for choose homework3")
         term = Head.TERM
     expression = BuildExpression(term, int(mode))
 
@@ -229,9 +236,10 @@ def HandData():
 
     print(">>>if you need details, input '1'")
     checkDetail = eval(sys.stdin.readline())
+    # checkDetail = 1
 
     HandDataIn = open("HandDataIn.txt", "r")
-    HandDataAns = open("HandDataAns.txt", "r")
+    # HandDataAns = open("HandDataAns.txt", "r")
     turn = 0
     while True:
         PrintString('\n')
@@ -241,12 +249,14 @@ def HandData():
         if stdinLine == '':
             break
         answer = Communicate(stdinLine, PATH)
-        stdAnsLine = FileReadLine(HandDataAns)
+        #stdAnsLine = FileReadLine(HandDataAns)
+        stdAnsLine = diff(stdinLine, x)
 
         # print input & answer
         if checkDetail == 1:
             PrintString('stdin:\n' + stdinLine)
             PrintString("stdAnswer:\n" + str(stdAnsLine))
+            PrintString("answer:\n" + str(answer))
         '''
         if int(checkDetail) == 1:
             print("STD answer:")
@@ -255,11 +265,11 @@ def HandData():
             print(answer)
         '''
 
-        stdAnswer = eval(stdAnsLine)
+        #stdAnswer = eval(stdAnsLine)
+        stdAnswer = diff(stdinLine, x)
         if answer == "":
             PrintNoOutput(turn, stdinLine, answer, stdAnswer)
             AK = 0
-            break
 
         if stdAnsLine == '':
             PrintNoAnswer(stdinLine, answer, stdAnswer)
@@ -272,7 +282,6 @@ def HandData():
         else:
             PrintWrongAnswer(turn, stdinLine, answer, stdAnswer)
             AK = 0
-            break
 
 
 def CompareCheck():
